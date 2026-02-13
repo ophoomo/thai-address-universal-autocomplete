@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E2E Test Fixture</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+    h1 { font-size: 1.5rem; margin-bottom: 1rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+    input[type="text"] { width: 100%; padding: 10px; border: 2px solid #ccc; border-radius: 6px; font-size: 1rem; }
+    .tac-dropdown--hidden { display: none; }
+    .tac-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+    .tac-item--active { background-color: #e8f0fe; }
+    .result { margin-top: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 6px; border: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <h1>E2E Test Fixture</h1>
+
+  <div class="form-group">
+    <label for="subdistrict-input">Sub-district (ตำบล)</label>
+    <input type="text" id="subdistrict-input" placeholder="พิมพ์ชื่อตำบล..." />
+  </div>
+
+  <div class="form-group">
+    <label for="district-input">District (อำเภอ)</label>
+    <input type="text" id="district-input" placeholder="พิมพ์ชื่ออำเภอ..." />
+  </div>
+
+  <div class="form-group">
+    <label for="province-input">Province (จังหวัด)</label>
+    <input type="text" id="province-input" placeholder="พิมพ์ชื่อจังหวัด..." />
+  </div>
+
+  <div class="form-group">
+    <label for="postal-input">Postal Code (รหัสไปรษณีย์)</label>
+    <input type="text" id="postal-input" placeholder="พิมพ์รหัสไปรษณีย์..." />
+  </div>
+
+  <div class="result" id="result" style="display: none;">
+    <h3>Selected Address:</h3>
+    <pre id="result-json"></pre>
+  </div>
+
+  <script src="./test-app.bundle.js"></script>
+</body>
+</html>

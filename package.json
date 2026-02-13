@@ -1,0 +1,87 @@
+{
+  "name": "thai-address-universal-autocomplete",
+  "version": "1.0.0",
+  "description": "A framework-agnostic, headless autocomplete component for Thai address suggestions powered by thai-address-universal",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "unpkg": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": "./dist/index.umd.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "test:e2e:build": "esbuild e2e/fixtures/test-app.ts --bundle --outfile=e2e/fixtures/test-app.bundle.js --format=iife --target=es2020",
+    "test:e2e": "npm run test:e2e:build && playwright test",
+    "test:e2e:headed": "npm run test:e2e:build && playwright test --headed",
+    "test:e2e:ui": "npm run test:e2e:build && playwright test --ui",
+    "test:all": "vitest run && playwright test",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "thai",
+    "address",
+    "autocomplete",
+    "headless",
+    "component",
+    "thai-address",
+    "framework-agnostic",
+    "accessibility",
+    "a11y"
+  ],
+   "author": {
+        "name": "THANAPHOOM",
+        "url": "https://github.com/ophoomo",
+        "email": "me@thanaphoom.dev"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ophoomo/thai-address-universal-autocomplete.git"
+    },
+    "bugs": "https://github.com/ophoomo/thai-address-universal-autocomplete/issues",
+    "homepage": "https://github.com/ophoomo/thai-address-universal-autocomplete",
+  "license": "ISC",
+  "peerDependencies": {
+    "thai-address-universal": ">=2.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^9.0.0",
+    "happy-dom": "^20.6.1",
+    "prettier": "^3.4.0",
+    "thai-address-universal": "^2.1.3",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.18"
+  }
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="140" viewBox="0 0 600 140"><defs><linearGradient id="a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:gold;stop-opacity:1"/><stop offset="100%" style="stop-color:teal;stop-opacity:1"/></linearGradient><linearGradient id="b" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:orange;stop-opacity:1"/><stop offset="100%" style="stop-color:#ff6a00;stop-opacity:1"/></linearGradient></defs><text x="50%" y="45%" font-size="40" font-weight="bold" text-anchor="middle" dy=".3em" fill="url(#a)" font-family="Open Sans, sans-serif">
+    THAI ADDRESS UNIVERSAL
+  </text><text x="93%" y="72%" font-size="28" font-weight="bold" text-anchor="end" fill="url(#b)" stroke="#fff" stroke-width="5" paint-order="stroke" font-family="Open Sans, sans-serif">
+    AUTOCOMPLETE
+  </text></svg>
