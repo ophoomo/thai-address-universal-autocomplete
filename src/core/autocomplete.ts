@@ -120,17 +120,23 @@ export function initAutocomplete(
   setInputAriaAttributes(input, listboxId);
 
   // --- Debounced search handler ---
+  let lastSearchedQuery = '';
+
   const debouncedSearch = debounce(async (query: string) => {
     if (query.length < minLength) {
       closeDropdown();
       return;
     }
 
+    // Skip search if query hasn't changed since last successful search
+    if (query === lastSearchedQuery) return;
+
     try {
       let results = await opts.source(query);
       if (results.length > maxResults) {
         results = results.slice(0, maxResults);
       }
+      lastSearchedQuery = query;
       state.suggestions = results;
       state.activeIndex = -1;
       state.query = query;
@@ -190,8 +196,11 @@ export function initAutocomplete(
   }
 
   function onDocumentClick(e: MouseEvent): void {
-    // Close dropdown when clicking outside the root container
+    // Close dropdown and clear suggestions when clicking outside the root container
     if (!root.contains(e.target as Node)) {
+      debouncedSearch.cancel();
+      state.suggestions = [];
+      lastSearchedQuery = '';
       closeDropdown();
     }
   }
@@ -218,6 +227,9 @@ export function initAutocomplete(
   }
 
   function selectItem(item: ThaiAddressSuggestion): void {
+    debouncedSearch.cancel();
+    state.suggestions = [];
+    lastSearchedQuery = '';
     closeDropdown();
     opts.onSelect(item);
   }
@@ -350,6 +362,7 @@ export function initAutocomplete(
       if (results.length > maxResults) {
         results = results.slice(0, maxResults);
       }
+      lastSearchedQuery = query;
       state.suggestions = results;
       state.activeIndex = -1;
 

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thai Address Autocomplete — Vanilla (Non-Module) Example</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Sarabun', 'Segoe UI', sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: #666;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #4a90d9;
+      box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.2);
+    }
+
+    /* Autocomplete dropdown styles */
+    .tac-dropdown {
+      border: 1px solid #ddd;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: -2px;
+    }
+
+    .tac-dropdown--hidden {
+      display: none;
+    }
+
+    .tac-item {
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.15s;
+    }
+
+    .tac-item:last-child {
+      border-bottom: none;
+    }
+
+    .tac-item:hover,
+    .tac-item--active {
+      background-color: #e8f0fe;
+    }
+
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 6px;
+      border: 1px solid #eee;
+    }
+
+    .result h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .result pre {
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Thai Address Autocomplete</h1>
+  <p class="subtitle">Vanilla JavaScript (non-module) &mdash; uses global <code>ThaiAddressAutocomplete</code></p>
+
+  <div class="form-group">
+    <label for="province-input">Search by Province (จังหวัด)</label>
+    <input type="text" id="province-input" placeholder="พิมพ์ชื่อจังหวัด เช่น กรุงเทพ" />
+  </div>
+
+  <div class="form-group">
+    <label for="district-input">Search by District (อำเภอ/เขต)</label>
+    <input type="text" id="district-input" placeholder="พิมพ์ชื่ออำเภอ เช่น บางรัก" />
+  </div>
+
+  <div class="form-group">
+    <label for="postal-input">Search by Postal Code (รหัสไปรษณีย์)</label>
+    <input type="text" id="postal-input" placeholder="พิมพ์รหัสไปรษณีย์ เช่น 10600" />
+  </div>
+
+  <div class="result" id="result" style="display: none;">
+    <h3>Selected Address:</h3>
+    <pre id="result-json"></pre>
+  </div>
+
+  <!--
+    Load the UMD builds via regular <script> tags (no type="module").
+    In production, use CDN URLs or copy the files to your project:
+
+    <script src="https://unpkg.com/thai-address-universal@2/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/thai-address-universal-autocomplete@1/dist/index.umd.js"></script>
+
+    For local development, point to the dist folder:
+  -->
+  <script src="../../node_modules/thai-address-universal/dist/index.umd.js"></script>
+  <script src="../../dist/index.umd.js"></script>
+
+  <script>
+    // The UMD build exposes `window.ThaiAddressAutocomplete`
+    var TAC = window.ThaiAddressAutocomplete;
+    var initAutocomplete = TAC.initAutocomplete;
+    var createProvinceSource = TAC.createProvinceSource;
+    var createDistrictSource = TAC.createDistrictSource;
+    var createPostalCodeSource = TAC.createPostalCodeSource;
+
+    // Show selected address in the result panel
+    function showResult(item) {
+      var resultEl = document.getElementById('result');
+      var jsonEl = document.getElementById('result-json');
+      resultEl.style.display = 'block';
+      jsonEl.textContent = JSON.stringify(item, null, 2);
+    }
+
+    // --- Province autocomplete ---
+    initAutocomplete(document.getElementById('province-input'), {
+      source: createProvinceSource({ maxResults: 10 }),
+      onSelect: function (item) {
+        document.getElementById('province-input').value = item.province;
+        showResult(item);
+      },
+      debounceMs: 300,
+    });
+
+    // --- District autocomplete ---
+    initAutocomplete(document.getElementById('district-input'), {
+      source: createDistrictSource({ maxResults: 10 }),
+      onSelect: function (item) {
+        document.getElementById('district-input').value = item.district;
+        showResult(item);
+      },
+      debounceMs: 300,
+    });
+
+    // --- Postal code autocomplete ---
+    initAutocomplete(document.getElementById('postal-input'), {
+      source: createPostalCodeSource({ maxResults: 10 }),
+      onSelect: function (item) {
+        document.getElementById('postal-input').value = item.postal_code;
+        showResult(item);
+      },
+      debounceMs: 300,
+    });
+  </script>
+</body>
+</html>
