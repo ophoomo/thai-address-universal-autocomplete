@@ -398,5 +398,149 @@ describe('initAutocomplete', () => {
       document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       expect(ac.getState().isOpen).toBe(false);
     });
+
+    it('should clear suggestions when clicking outside', async () => {
+      ac = initAutocomplete(input, createOptions());
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+
+      expect(ac.getState().suggestions).toHaveLength(3);
+
+      // Click outside
+      document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(ac.getState().suggestions).toHaveLength(0);
+    });
+
+    it('should not reopen dropdown on focus after clicking outside', async () => {
+      ac = initAutocomplete(input, createOptions());
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+
+      expect(ac.getState().isOpen).toBe(true);
+
+      // Click outside to close
+      document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(ac.getState().isOpen).toBe(false);
+
+      // Re-focus the input — should NOT reopen because suggestions were cleared
+      input.dispatchEvent(new Event('focus'));
+      expect(ac.getState().isOpen).toBe(false);
+    });
+  });
+
+  describe('selection clears state', () => {
+    it('should clear suggestions after mouse selection', async () => {
+      ac = initAutocomplete(input, createOptions());
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+
+      expect(ac.getState().suggestions).toHaveLength(3);
+
+      // Click the first suggestion item
+      const root = input.parentElement!;
+      const firstOption = root.querySelector('[role="option"]') as HTMLElement;
+      firstOption.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+
+      expect(ac.getState().isOpen).toBe(false);
+      expect(ac.getState().suggestions).toHaveLength(0);
+    });
+
+    it('should clear suggestions after keyboard selection', async () => {
+      ac = initAutocomplete(input, createOptions());
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+
+      pressKey(input, 'ArrowDown'); // activeIndex = 0
+      pressKey(input, 'Enter');
+
+      expect(ac.getState().isOpen).toBe(false);
+      expect(ac.getState().suggestions).toHaveLength(0);
+    });
+
+    it('should not reopen dropdown on focus after selection', async () => {
+      ac = initAutocomplete(input, createOptions());
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+
+      // Select via keyboard
+      pressKey(input, 'ArrowDown');
+      pressKey(input, 'Enter');
+      expect(ac.getState().isOpen).toBe(false);
+
+      // Re-focus the input — should NOT reopen
+      input.dispatchEvent(new Event('focus'));
+      expect(ac.getState().isOpen).toBe(false);
+    });
+
+    it('should cancel pending debounced search on selection', async () => {
+      const source = createMockSource();
+      ac = initAutocomplete(input, createOptions({ source, debounceMs: 300 }));
+
+      // Type to trigger debounced search (but don't wait for debounce)
+      typeInto(input, 'กรุง');
+
+      // Programmatic search to open dropdown immediately
+      await ac.search('กรุง');
+
+      // Select an item before the debounced search fires
+      pressKey(input, 'ArrowDown');
+      pressKey(input, 'Enter');
+
+      // Advance past the debounce timeout
+      await vi.advanceTimersByTimeAsync(400);
+
+      // Source should have been called only once (from ac.search), not from the debounced input
+      expect(source).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('search deduplication', () => {
+    it('should not re-search for the same query', async () => {
+      const source = createMockSource();
+      ac = initAutocomplete(input, createOptions({ source }));
+
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+
+      expect(source).toHaveBeenCalledTimes(1);
+
+      // Type the same query again
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+
+      // Source should NOT be called again for the same query
+      expect(source).toHaveBeenCalledTimes(1);
+    });
+
+    it('should re-search after selection even with same query', async () => {
+      const source = createMockSource();
+      ac = initAutocomplete(input, createOptions({ source }));
+
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+      expect(source).toHaveBeenCalledTimes(1);
+
+      // Select an item (clears lastSearchedQuery)
+      pressKey(input, 'ArrowDown');
+      pressKey(input, 'Enter');
+
+      // Type the same query again — should search because selection cleared the cache
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+      expect(source).toHaveBeenCalledTimes(2);
+    });
+
+    it('should search when query changes', async () => {
+      const source = createMockSource();
+      ac = initAutocomplete(input, createOptions({ source }));
+
+      typeInto(input, 'กรุง');
+      await vi.advanceTimersByTimeAsync(10);
+      expect(source).toHaveBeenCalledTimes(1);
+
+      typeInto(input, 'กรุงเทพ');
+      await vi.advanceTimersByTimeAsync(10);
+      expect(source).toHaveBeenCalledTimes(2);
+    });
   });
 });
